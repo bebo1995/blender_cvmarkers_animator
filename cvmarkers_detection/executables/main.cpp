@@ -117,7 +117,7 @@ void detectCharucoBoardWithoutCalibration()
             break;
     }
 }
-int main(int argc, char *argv[])
+int pain(int argc, char *argv[])
 {
     cv::CommandLineParser parser(argc, argv, keys);
     parser.about(about);
@@ -143,4 +143,10 @@ int main(int argc, char *argv[])
         break;
     }
     return 0;
+}
+
+int main()
+{
+    cvdetection::Camera cam;
+    cam.calibrate("../../../cvmarkers_detection/calibration_input_settings.xml");
 }
