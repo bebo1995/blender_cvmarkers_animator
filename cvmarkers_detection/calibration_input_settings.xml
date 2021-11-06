@@ -17,6 +17,9 @@
 		To use an image list   -> give the path to the XML or YAML file containing the list of the images, like "/tmp/circles_list.xml"
 		-->
   <Input>"0"</Input>
+  <!-- If you selected to use an input camera, you will need to specify height and with of your screen-->
+  <ScreenWidth>640</ScreenWidth>
+  <ScreenHeight>480</ScreenHeight>
   <!--  If true (non-zero) we flip the input images around the horizontal axis.-->
   <Input_FlipAroundHorizontalAxis>0</Input_FlipAroundHorizontalAxis>
   

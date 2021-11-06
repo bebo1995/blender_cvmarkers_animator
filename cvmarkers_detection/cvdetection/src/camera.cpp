@@ -95,6 +95,8 @@ namespace cvdetection
             node["Input_FlipAroundHorizontalAxis"] >> flipVertical;
             node["Show_UndistortedImage"] >> showUndistorted;
             node["Input"] >> input;
+            node["ScreenHeight"] >> screenHeight;
+            node["ScreenWidth"] >> screenWidth;
             node["Input_Delay"] >> delay;
             node["Fix_K1"] >> fixK1;
             node["Fix_K2"] >> fixK2;
@@ -146,8 +148,8 @@ namespace cvdetection
                 if (inputType == CAMERA)
                 {
                     inputCapture.open(cameraID);
-                    inputCapture.set(CAP_PROP_FRAME_WIDTH, 640);
-                    inputCapture.set(CAP_PROP_FRAME_HEIGHT, 480);
+                    inputCapture.set(CAP_PROP_FRAME_WIDTH, this->screenWidth);
+                    inputCapture.set(CAP_PROP_FRAME_HEIGHT, this->screenHeight);
                 }
                 if (inputType == VIDEO_FILE)
                     inputCapture.open(input);
@@ -264,12 +266,14 @@ namespace cvdetection
         string outputFileName;       // The name of the file where to write
         bool showUndistorted;        // Show undistorted images after calibration
         string input;                // The input ->
-        bool useFisheye;             // use fisheye camera model for calibration
-        bool fixK1;                  // fix K1 distortion coefficient
-        bool fixK2;                  // fix K2 distortion coefficient
-        bool fixK3;                  // fix K3 distortion coefficient
-        bool fixK4;                  // fix K4 distortion coefficient
-        bool fixK5;                  // fix K5 distortion coefficient
+        int screenHeight;
+        int screenWidth;
+        bool useFisheye; // use fisheye camera model for calibration
+        bool fixK1;      // fix K1 distortion coefficient
+        bool fixK2;      // fix K2 distortion coefficient
+        bool fixK3;      // fix K3 distortion coefficient
+        bool fixK4;      // fix K4 distortion coefficient
+        bool fixK5;      // fix K5 distortion coefficient
 
         int cameraID;
         vector<string> imageList;
@@ -801,17 +805,32 @@ namespace cvdetection
         }
         //! [show_results]
 
-        this->calibrationParamsPath = s.outputFileName;
+        this->parseCalibrationParametersFromXml(s.outputFileName);
         VERBPRINT("Calibration done.\n");
         return CAMERA_OK;
     }
 
-    void Camera::setCalibrationParamsPath(const std::string &path)
+    int Camera::parseCalibrationParametersFromXml(const std::string &parameters_xml_path)
     {
-        this->calibrationParamsPath = path;
+        cv::FileStorage fs(parameters_xml_path, cv::FileStorage::READ);
+        if (!fs.isOpened())
+        {
+            VERBERR("Input calibration parameters file invalid\n");
+            return CAMERA_NOT_OK;
+        }
+        fs["camera_matrix"] >> this->camMatrix;
+        fs["distortion_coefficients"] >> this->distCoeffs;
+        VERBPRINT("Calibration parameters parsed successfully.\n");
+        return CAMERA_OK;
     }
-    std::string Camera::getCalibrationParamsPath()
+
+    void Camera::getCamMatrix(cv::Mat *(&mat_ptr))
     {
-        return this->calibrationParamsPath;
+        mat_ptr = &(this->camMatrix);
+    }
+
+    void Camera::getDistCoeffs(cv::Mat *(&mat_ptr))
+    {
+        mat_ptr = &(this->distCoeffs);
     }
 }
