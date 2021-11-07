@@ -10,6 +10,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/aruco/charuco.hpp>
 
 #include <cvdetection/camera.hpp>
 
@@ -446,7 +447,7 @@ namespace cvdetection
                                  const vector<float> &reprojErrs, const vector<vector<Point2f>> &imagePoints,
                                  double totalAvgErr, const vector<Point3f> &newObjPoints)
     {
-        VERBPRINT("Saving calibration results in: %s\n", s.outputFileName.c_str());
+        VERBPRINT("Saving calibration results.\n");
         FileStorage fs(s.outputFileName, FileStorage::WRITE);
 
         time_t tm;
@@ -585,7 +586,11 @@ namespace cvdetection
 
     //------------------------- Constructor ------------------------------>
 
-    Camera::Camera() {}
+    Camera::Camera()
+    {
+        //setting predefined dictionary
+        this->markersDictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+    }
 
     //------------------------- Camera public methods ------------------------------>
 
@@ -824,6 +829,29 @@ namespace cvdetection
         return CAMERA_OK;
     }
 
+    void Camera::getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image, std::map<int, std::map<std::string, cv::Vec3d>> &markersPoses)
+    {
+        //detecting and estimating pose of markers
+        std::vector<int> markerIds;
+        std::vector<std::vector<cv::Point2f>> markerCorners;
+        cv::Ptr<cv::aruco::DetectorParameters> params = cv::aruco::DetectorParameters::create();
+        cv::aruco::detectMarkers(image, this->markersDictionary, markerCorners, markerIds, params);
+        if (markerIds.size() > 0)
+        {
+            cv::aruco::drawDetectedMarkers(image, markerCorners, markerIds);
+            std::vector<cv::Vec3d> rvec, tvec;
+            cv::aruco::estimatePoseSingleMarkers(markerCorners, markerSide, this->camMatrix, this->distCoeffs, rvec, tvec);
+            for (size_t i = 0; i < tvec.size(); i++)
+            {
+                cv::aruco::drawAxis(image, camMatrix, distCoeffs, rvec[i], tvec[i], 0.1);
+                std::map<std::string, cv::Vec3d> map;
+                map["coordinates"] = tvec[i];
+                map["orientation"] = rvec[i];
+                markersPoses[markerIds[i]] = map;
+            }
+        }
+    }
+
     void Camera::getCamMatrix(cv::Mat *(&mat_ptr))
     {
         mat_ptr = &(this->camMatrix);
@@ -832,5 +860,15 @@ namespace cvdetection
     void Camera::getDistCoeffs(cv::Mat *(&mat_ptr))
     {
         mat_ptr = &(this->distCoeffs);
+    }
+
+    void Camera::setMarkersDictionary(const cv::Ptr<cv::aruco::Dictionary> &dictionary)
+    {
+        this->markersDictionary = dictionary;
+    }
+
+    cv::Ptr<cv::aruco::Dictionary> Camera::getMarkersDictionary()
+    {
+        return this->markersDictionary;
     }
 }
