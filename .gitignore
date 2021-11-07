@@ -1,2 +1,3 @@
 build/
 .vscode/
+blender_animation/__pycache__
