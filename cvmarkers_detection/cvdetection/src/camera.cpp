@@ -11,6 +11,7 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco/charuco.hpp>
+#include <opencv2/core/eigen.hpp>
 #include <eigen3/Eigen/Core>
 
 #include <cvdetection/camera.hpp>
@@ -845,7 +846,10 @@ namespace cvdetection
             for (size_t i = 0; i < tvec.size(); i++)
             {
                 cv::aruco::drawAxis(image, camMatrix, distCoeffs, rvec[i], tvec[i], 0.1);
-                detectedMarkers.push_back(Marker(markerIds[i], Eigen::Vector3d(tvec[i][0], tvec[i][1], tvec[i][2]), Eigen::Vector3d(rvec[i][0], rvec[i][1], rvec[i][2])));
+                cv::Mat3d rMat;
+                cv::Rodrigues(rvec[i], rMat);
+                Eigen::Map<Eigen::Matrix3d> eigenRMat(rMat.ptr<double>(), rMat.rows, rMat.cols);
+                detectedMarkers.push_back(Marker(markerIds[i], Eigen::Vector3d(tvec[i][0], tvec[i][1], tvec[i][2]), eigenRMat));
             }
         }
     }

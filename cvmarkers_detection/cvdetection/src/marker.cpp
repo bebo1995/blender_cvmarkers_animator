@@ -6,11 +6,11 @@ namespace cvdetection
     //---------- Constructors --------------------------------------------------------------->
     Marker::Marker() {}
 
-    Marker::Marker(const int &ID, const Eigen::Vector3d &coordinatesVec, const Eigen::Vector3d &orientationVec)
+    Marker::Marker(const int &ID, const Eigen::Vector3d &coordinatesVec, const Eigen::Matrix3d &orientationMat)
     {
         this->id = ID;
         this->coordinates = coordinatesVec;
-        this->orientation = orientationVec;
+        this->orientation = orientationMat;
     }
 
     //---------- Public methods --------------------------------------------------------------->
@@ -24,9 +24,9 @@ namespace cvdetection
         this->coordinates = coordinatesVec;
     }
 
-    void Marker::setOrientation(const Eigen::Vector3d &orientationVec)
+    void Marker::setOrientation(const Eigen::Matrix3d &orientationMat)
     {
-        this->orientation = orientationVec;
+        this->orientation = orientationMat;
     }
 
     int Marker::getId()
@@ -39,8 +39,8 @@ namespace cvdetection
         coordinatesVec = this->coordinates;
     }
 
-    void Marker::getOrientation(Eigen::Vector3d &orientationVec)
+    void Marker::getOrientation(Eigen::Matrix3d &orientationMat)
     {
-        orientationVec = this->orientation;
+        orientationMat = this->orientation;
     }
 }

@@ -8,6 +8,7 @@
 
 #include <cvdetection/camera.hpp>
 #include <cvdetection/marker.hpp>
+#include <cvdetection/bone.hpp>
 
 int main()
 {
@@ -19,7 +20,7 @@ int main()
     video.set(cv::CAP_PROP_FRAME_WIDTH, 640);
     video.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
     std::map<std::string, std::string> output;
-    std::string firstLineOutput = "markerID, coordinateX, coordinateY, coordinateZ, orientationX, orientationY, orientationZ";
+    std::string firstLineOutput = "boneName, locationX, locationY, locationZ, rotationX, rotationY, rotationZ";
     output["-1"] = firstLineOutput;
     while (video.grab())
     {
@@ -27,22 +28,36 @@ int main()
         video.retrieve(image);
         std::vector<cvdetection::Marker> markers;
         cam.getArucoMarkersPoses(0.05, image, markers);
+        std::array<cvdetection::Marker, 2> hipsJoints;
+        cvdetection::Bone *hips;
+        int count = 0;
         for (cvdetection::Marker marker : markers)
         {
-            Eigen::Vector3d coordinates;
-            Eigen::Vector3d orientation;
-            marker.getCoordinates(coordinates);
-            marker.getOrientation(orientation);
-            std::string line = std::to_string(marker.getId()) + ", " +
-                               std::to_string(coordinates[0]) + ", " +
-                               std::to_string(coordinates[1]) + ", " +
-                               std::to_string(coordinates[2]) + ", " +
-                               std::to_string(orientation[0]) + ", " +
-                               std::to_string(orientation[1]) + ", " +
-                               std::to_string(orientation[2]);
-            output[std::to_string(marker.getId())] = line;
+            if (marker.getId() == 0)
+            {
+                hipsJoints[0] = marker;
+                count++;
+            }
+            if (marker.getId() == 1)
+            {
+                hipsJoints[1] = marker;
+                count++;
+            }
         }
-        std::ofstream myfile("../../../markersDetection.csv");
+        if (count >= 2)
+        {
+            hips = new cvdetection::Bone("hips", hipsJoints[0], hipsJoints[1]);
+            std::string line;
+            Eigen::Vector3d loc;
+            Eigen::Vector3d rot;
+            hips->getName(line);
+            hips->getLocation(loc);
+            hips->getRotation(rot);
+            line += ", " + std::to_string(loc[0]) + ", " + std::to_string(loc[1]) + ", " + std::to_string(loc[2]);
+            line += ", " + std::to_string(rot[0]) + ", " + std::to_string(rot[1]) + ", " + std::to_string(rot[2]);
+            output["0"] = line;
+        }
+        std::ofstream myfile("../../../detectedBones.csv");
         for (std::map<std::string, std::string>::iterator it = output.begin(); it != output.end(); ++it)
         {
             myfile << it->second << std::endl;

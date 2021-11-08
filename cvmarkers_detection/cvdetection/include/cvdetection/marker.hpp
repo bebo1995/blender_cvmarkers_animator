@@ -11,7 +11,7 @@ namespace cvdetection
     private:
         int id;
         Eigen::Vector3d coordinates;
-        Eigen::Vector3d orientation;
+        Eigen::Matrix3d orientation;
 
     public:
         /**
@@ -23,10 +23,10 @@ namespace cvdetection
          * @brief Marker instantiates a new object of the Marker class and sets its id, coordinates and rotation.
          * @param ID id of this marker.
          * @param coordinatesVec 3D coordinates of the marker in the scene.
-         * @param orientationVec 3D orientation of the marker in the scene.
+         * @param orientationMat 3D rotation matrix of the marker in the scene.
          * @return instance of Marker.
          */
-        Marker(const int &ID, const Eigen::Vector3d &coordinatesVec, const Eigen::Vector3d &orientationVec);
+        Marker(const int &ID, const Eigen::Vector3d &coordinatesVec, const Eigen::Matrix3d &orientationMat);
 
     public:
         /**
@@ -41,9 +41,9 @@ namespace cvdetection
         void setCoordinates(const Eigen::Vector3d &coordinatesVec);
         /**
          * @brief setOrientation sets the 3D orientation of this marker.
-         * @param orientationVec orientation of the marker.
+         * @param orientationVec rotation matrix of the marker.
          */
-        void setOrientation(const Eigen::Vector3d &orientationVec);
+        void setOrientation(const Eigen::Matrix3d &orientationMat);
         /**
          * @brief getId returns the ID of this marker.
          * @return id of the marker.
@@ -56,9 +56,9 @@ namespace cvdetection
         void getCoordinates(Eigen::Vector3d &coordinatesVec);
         /**
          * @brief getOrientation returns the 3D orientation of this marker.
-         * @param orientationVec orientation of the marker.
+         * @param orientationVec rotation matrix of the marker.
          */
-        void getOrientation(Eigen::Vector3d &orientationVec);
+        void getOrientation(Eigen::Matrix3d &orientationMat);
     };
 }
 

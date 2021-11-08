@@ -1,5 +1,5 @@
-#ifndef CAMERA_HPP_
-#define CAMERA_HPP_
+#ifndef CAMERA_H_
+#define CAMERA_H_
 
 #include <iostream>
 #include <map>
