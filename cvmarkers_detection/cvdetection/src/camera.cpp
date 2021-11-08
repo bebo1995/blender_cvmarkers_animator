@@ -11,6 +11,7 @@
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco/charuco.hpp>
+#include <eigen3/Eigen/Core>
 
 #include <cvdetection/camera.hpp>
 
@@ -829,7 +830,7 @@ namespace cvdetection
         return CAMERA_OK;
     }
 
-    void Camera::getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image, std::map<int, std::map<std::string, cv::Vec3d>> &markersPoses)
+    void Camera::getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image, std::vector<Marker> &detectedMarkers)
     {
         //detecting and estimating pose of markers
         std::vector<int> markerIds;
@@ -844,10 +845,7 @@ namespace cvdetection
             for (size_t i = 0; i < tvec.size(); i++)
             {
                 cv::aruco::drawAxis(image, camMatrix, distCoeffs, rvec[i], tvec[i], 0.1);
-                std::map<std::string, cv::Vec3d> map;
-                map["coordinates"] = tvec[i];
-                map["orientation"] = rvec[i];
-                markersPoses[markerIds[i]] = map;
+                detectedMarkers.push_back(Marker(markerIds[i], Eigen::Vector3d(tvec[i][0], tvec[i][1], tvec[i][2]), Eigen::Vector3d(rvec[i][0], rvec[i][1], rvec[i][2])));
             }
         }
     }

@@ -4,8 +4,10 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <eigen3/Eigen/Core>
 
 #include <cvdetection/camera.hpp>
+#include <cvdetection/marker.hpp>
 
 int main()
 {
@@ -23,21 +25,22 @@ int main()
     {
         cv::Mat image;
         video.retrieve(image);
-        std::map<int, std::map<std::string, cv::Vec3d>> markersPoses;
-        cam.getArucoMarkersPoses(0.05, image, markersPoses);
-        for (std::map<int, std::map<std::string, cv::Vec3d>>::iterator it = markersPoses.begin();
-             it != markersPoses.end(); ++it)
+        std::vector<cvdetection::Marker> markers;
+        cam.getArucoMarkersPoses(0.05, image, markers);
+        for (cvdetection::Marker marker : markers)
         {
-            cv::Vec3d coordinates = it->second["coordinates"];
-            cv::Vec3d orientation = it->second["orientation"];
-            std::string line = std::to_string(it->first) + ", " +
+            Eigen::Vector3d coordinates;
+            Eigen::Vector3d orientation;
+            marker.getCoordinates(coordinates);
+            marker.getOrientation(orientation);
+            std::string line = std::to_string(marker.getId()) + ", " +
                                std::to_string(coordinates[0]) + ", " +
                                std::to_string(coordinates[1]) + ", " +
                                std::to_string(coordinates[2]) + ", " +
                                std::to_string(orientation[0]) + ", " +
                                std::to_string(orientation[1]) + ", " +
                                std::to_string(orientation[2]);
-            output[std::to_string(it->first)] = line;
+            output[std::to_string(marker.getId())] = line;
         }
         std::ofstream myfile("../../../markersDetection.csv");
         for (std::map<std::string, std::string>::iterator it = output.begin(); it != output.end(); ++it)

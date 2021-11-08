@@ -4,6 +4,8 @@
 #include <iostream>
 #include <map>
 
+#include <cvdetection/marker.hpp>
+
 namespace cvdetection
 {
     class Camera
@@ -49,11 +51,10 @@ namespace cvdetection
          * @brief getArucoMarkersPoses estimates the aruco markers' poses from the passed image.
          * @param markerSide side of the markers in the scene in meters.
          * @param image to be analyzed.
-         * @param markersPoses map containing coordinates and orientations poses mapped to every marker
-         * detected in the image.
+         * @param detectedMarkers vector containing all Aruco markers detected in the image.
          */
         void getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image,
-                                  std::map<int, std::map<std::string, cv::Vec3d>> &markersPoses);
+                                  std::vector<Marker> &detectedMarkers);
 
     public:
         /**
@@ -73,7 +74,7 @@ namespace cvdetection
         void setMarkersDictionary(const cv::Ptr<cv::aruco::Dictionary> &dictionary);
         /**
          * @brief getMarkersDictionary returns tge dictionary this instance of Camera is detecting to.
-         * @returns detected dictionary.
+         * @return detected dictionary.
          */
         cv::Ptr<cv::aruco::Dictionary> getMarkersDictionary();
     };
