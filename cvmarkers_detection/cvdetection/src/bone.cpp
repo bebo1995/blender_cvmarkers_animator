@@ -1,3 +1,5 @@
+#include <eigen3/Eigen/Geometry>
+
 #include <cvdetection/bone.hpp>
 
 namespace cvdetection
