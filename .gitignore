@@ -1,3 +1,6 @@
 build/
 .vscode/
+#cvmarkers_detection/calibration_input_settings.xml
+#cvmarkers_detection/out_camera_data
+detectedBones.csv
 blender_animation/__pycache__

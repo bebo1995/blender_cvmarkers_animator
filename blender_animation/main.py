@@ -1,11 +1,12 @@
 import csv
 import bpy
 import mathutils
-from marker import Marker
+import time
+from bone import Bone
 
 
 def parseCSV(csvPath):
-    markers = []
+    bones = []
     with open(csvPath) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
@@ -13,27 +14,40 @@ def parseCSV(csvPath):
             if line_count == 0:
                 line_count += 1
             else:
-                m = Marker.fromCSVLine(row)
-                markers.append(m)
-                print(m.toString())
+                b = Bone.fromCSVLine(row)
+                bones.append(b)
+                print(b.toString())
                 line_count += 1
-    print(f'Processed {line_count} lines.')
-    return markers
+    #print(f'Processed {line_count} lines.')
+    return bones
+
+
+def timer_call_fnc():
+    # parsing camera scene detected bones
+    bones = parseCSV(
+        '/home/alberto/VSCode workspace/blender_cvmarkers_animator/detectedBones.csv')
+
+    # moving Blender scene bones
+    bpy.ops.object.mode_set(mode='POSE')
+    armature = bpy.data.objects["metarig"]
+    bone = armature.pose.bones[bones[0].id]
+    bone.rotation_mode = "XYZ"
+    bone.rotation_mode = "XYZ"
+    bone.location[0] = bones[0].location[0]
+    bone.location[1] = bones[0].location[1]
+    bone.location[2] = bones[0].location[2]
+    bone.rotation_euler[0] = bones[0].rotation[0] / 360 * 6.28
+    bone.rotation_euler[1] = bones[0].rotation[1] / 360 * 6.28
+    bone.rotation_euler[2] = bones[0].rotation[2] / 360 * 6.28
+    return 1.0  # call every second
 
 
 def main():
-    # while(True):
-    markers = parseCSV(
-        '/home/alberto/VSCode workspace/blender_cvmarkers_animator/markersDetection.csv')
+    bpy.app.timers.register(timer_call_fnc)
+    timer_call_fnc()  # make first call
 
-    bpy.ops.object.mode_set(mode='POSE')
-    armature = bpy.data.objects["metarig"]
-    bone = armature.pose.bones["hips"]
-    bone.rotation_mode = "XYZ"
-    bone.rotation_euler[0] = float(
-        markers[0].coordinates[1]) * 100 / 360 * 6.28
-    bone.rotation_euler[1] = float(
-        markers[0].coordinates[0]) * 100 / 360 * 6.28
+    # unregister later:
+    #bpy.app.timers .unregister( timer_call_fnc )
 
 
 if __name__ == "__main__":
