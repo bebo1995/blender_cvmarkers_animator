@@ -35,7 +35,7 @@ def timer_call_fnc(bone):
     bone.rotation_euler[0] = bones[0].rotation[0] / 360 * 6.28
     bone.rotation_euler[1] = bones[0].rotation[1] / 360 * 6.28
     bone.rotation_euler[2] = bones[0].rotation[2] / 360 * 6.28
-    return 0.1  # call every second
+    return 0.01  # call every 0.01 seconds
 
 
 def main():
