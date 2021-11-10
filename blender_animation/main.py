@@ -2,6 +2,7 @@ import csv
 import bpy
 import mathutils
 import time
+import functools
 from bone import Bone
 
 
@@ -22,29 +23,30 @@ def parseCSV(csvPath):
     return bones
 
 
-def timer_call_fnc():
+def timer_call_fnc(bone):
     # parsing camera scene detected bones
     bones = parseCSV(
         '/home/alberto/VSCode workspace/blender_cvmarkers_animator/detectedBones.csv')
 
     # moving Blender scene bones
-    bpy.ops.object.mode_set(mode='POSE')
-    armature = bpy.data.objects["metarig"]
-    bone = armature.pose.bones[bones[0].id]
-    bone.rotation_mode = "XYZ"
-    bone.rotation_mode = "XYZ"
     bone.location[0] = bones[0].location[0]
     bone.location[1] = bones[0].location[1]
     bone.location[2] = bones[0].location[2]
     bone.rotation_euler[0] = bones[0].rotation[0] / 360 * 6.28
     bone.rotation_euler[1] = bones[0].rotation[1] / 360 * 6.28
     bone.rotation_euler[2] = bones[0].rotation[2] / 360 * 6.28
-    return 1.0  # call every second
+    return 0.1  # call every second
 
 
 def main():
-    bpy.app.timers.register(timer_call_fnc)
-    timer_call_fnc()  # make first call
+    bones = parseCSV(
+        '/home/alberto/VSCode workspace/blender_cvmarkers_animator/detectedBones.csv')
+    bpy.ops.object.mode_set(mode='POSE')
+    armature = bpy.data.objects["metarig"]
+    bone = armature.pose.bones[bones[0].id]
+    bone.rotation_mode = "XYZ"
+    bpy.app.timers.register((functools.partial(timer_call_fnc, bone)))
+    timer_call_fnc(bone)  # make first call
 
     # unregister later:
     #bpy.app.timers .unregister( timer_call_fnc )
