@@ -22,12 +22,14 @@ int main()
     std::map<std::string, std::string> output;
     std::string firstLineOutput = "boneName, locationX, locationY, locationZ, rotationX, rotationY, rotationZ";
     output["-1"] = firstLineOutput;
+    bool rootBoneFound = false;
+    Eigen::Vector3d center(0, 0, 0);
     while (video.grab())
     {
         cv::Mat image;
         video.retrieve(image);
         std::vector<cvdetection::Marker> markers;
-        cam.getArucoMarkersPoses(0.05, image, markers);
+        cam.getArucoMarkersPoses(0.05, image, markers, center);
         std::array<cvdetection::Marker, 2> hipsJoints;
         cvdetection::Bone *hips;
         int count = 0;
@@ -37,6 +39,11 @@ int main()
             {
                 hipsJoints[0] = marker;
                 count++;
+                if (!rootBoneFound)
+                {
+                    marker.getCoordinates(center);
+                    rootBoneFound = true;
+                }
             }
             if (marker.getId() == 1)
             {

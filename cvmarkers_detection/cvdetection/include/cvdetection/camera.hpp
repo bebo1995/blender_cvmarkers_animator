@@ -52,9 +52,10 @@ namespace cvdetection
          * @param markerSide side of the markers in the scene in meters.
          * @param image to be analyzed.
          * @param detectedMarkers vector containing all Aruco markers detected in the image.
+         * @param center 3D coordinates of the center of the scene (default = 0,0,0).
          */
         void getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image,
-                                  std::vector<Marker> &detectedMarkers);
+                                  std::vector<Marker> &detectedMarkers, const Eigen::Vector3d &center = Eigen::Vector3d(0, 0, 0));
 
     public:
         /**

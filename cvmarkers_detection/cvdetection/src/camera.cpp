@@ -830,7 +830,7 @@ namespace cvdetection
         return CAMERA_OK;
     }
 
-    void Camera::getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image, std::vector<Marker> &detectedMarkers)
+    void Camera::getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image, std::vector<Marker> &detectedMarkers, const Eigen::Vector3d &center)
     {
         //detecting and estimating pose of markers
         std::vector<int> markerIds;
@@ -845,10 +845,15 @@ namespace cvdetection
             for (size_t i = 0; i < tvec.size(); i++)
             {
                 cv::aruco::drawAxis(image, camMatrix, distCoeffs, rvec[i], tvec[i], 0.1);
+                //getting 3D coordinates
+                Eigen::Vector3d coordinates(tvec[i][0], tvec[i][1], tvec[i][2]);
+                coordinates = coordinates - center;
+                //getting rotation matrix
                 cv::Mat rMat = cv::Mat::zeros(3, 3, CV_64F);
                 cv::Rodrigues(rvec[i], rMat);
                 Eigen::Map<Eigen::Matrix3d> eigenRMat(rMat.ptr<double>(), rMat.rows, rMat.cols);
-                detectedMarkers.push_back(Marker(markerIds[i], Eigen::Vector3d(tvec[i][0], tvec[i][1], tvec[i][2]), eigenRMat));
+                //getting Marker
+                detectedMarkers.push_back(Marker(markerIds[i], coordinates, eigenRMat));
             }
         }
     }
