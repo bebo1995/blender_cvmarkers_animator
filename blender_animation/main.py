@@ -29,6 +29,9 @@ def timer_call_fnc(bone):
         '/home/alberto/VSCode workspace/blender_cvmarkers_animator/detectedBones.csv')
 
     # moving Blender scene bones
+    if len(bones) == 0:
+        print("Empty file \n")
+        return 0.01
     bone.location[0] = bones[0].location[0]
     bone.location[1] = bones[0].location[1]
     bone.location[2] = bones[0].location[2]

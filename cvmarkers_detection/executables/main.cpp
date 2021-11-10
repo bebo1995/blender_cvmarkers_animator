@@ -63,13 +63,13 @@ int main()
             line += ", " + std::to_string(loc[0]) + ", " + std::to_string(loc[1]) + ", " + std::to_string(loc[2]);
             line += ", " + std::to_string(rot[0]) + ", " + std::to_string(rot[1]) + ", " + std::to_string(rot[2]);
             output["0"] = line;
+            std::ofstream myfile("../../../detectedBones.csv");
+            for (std::map<std::string, std::string>::iterator it = output.begin(); it != output.end(); ++it)
+            {
+                myfile << it->second << std::endl;
+            }
+            myfile.close();
         }
-        std::ofstream myfile("../../../detectedBones.csv");
-        for (std::map<std::string, std::string>::iterator it = output.begin(); it != output.end(); ++it)
-        {
-            myfile << it->second << std::endl;
-        }
-        myfile.close();
         cv::imshow("out", image);
         char key = (char)cv::waitKey(30);
         if (key == 27)
