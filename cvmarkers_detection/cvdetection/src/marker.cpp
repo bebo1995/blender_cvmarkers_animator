@@ -22,8 +22,8 @@ namespace cvdetection
         case boneMap::hips:
             this->boneName = "hips";
             break;
-        case boneMap::forearm_L:
-            this->boneName = "forearm_L";
+        case boneMap::forearm_R:
+            this->boneName = "forearm.R";
             break;
         default:
             this->boneName = "";

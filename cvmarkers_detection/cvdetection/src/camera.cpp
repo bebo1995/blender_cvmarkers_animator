@@ -848,15 +848,22 @@ namespace cvdetection
                 cv::aruco::drawAxis(image, camMatrix, distCoeffs, rvec[i], tvec[i], 0.1);
                 //getting 3D coordinates
                 Eigen::Vector3d coordinates(tvec[i][0], tvec[i][1], tvec[i][2]);
-                //getting rotation matrix
-                cv::Mat rMat = cv::Mat::zeros(3, 3, CV_64F);
-                cv::Rodrigues(rvec[i], rMat);
-                Eigen::Map<Eigen::Matrix3d> eigenRMat(rMat.ptr<double>(), rMat.rows, rMat.cols);
-                Eigen::Vector3d eulerAngles = eigenRMat.eulerAngles(0, 1, 2);
+                //getting euler angles vector
                 Eigen::Vector3d rotVec(rvec[i][0], rvec[i][1], rvec[i][2]); //in radians
                 //centering location and rotation in initialposition
                 coordinates = coordinates - center;
-                rotVec = rotVec - initialRotation;
+                if (rotVec[0] > 0)
+                    rotVec[0] = rotVec[0] - initialRotation[0];
+                else
+                    rotVec[0] = rotVec[0] + initialRotation[0];
+                if (rotVec[1] > 0)
+                    rotVec[1] = rotVec[1] - initialRotation[1];
+                else
+                    rotVec[1] = rotVec[1] + initialRotation[1];
+                if (rotVec[2] > 0)
+                    rotVec[2] = rotVec[2] - initialRotation[2];
+                else
+                    rotVec[2] = rotVec[2] + initialRotation[2];
                 //getting Marker
                 detectedMarkers.push_back(Marker(markerIds[i], coordinates, rotVec));
             }

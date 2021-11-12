@@ -15,9 +15,9 @@ int main()
     //cam.calibrate("../../../cvmarkers_detection/calibration_input_settings.xml");
     cam.parseCalibrationParametersFromXml("../../../cvmarkers_detection/out_camera_data.xml");
     cv::VideoCapture video;
-    video.open(0);
-    video.set(cv::CAP_PROP_FRAME_WIDTH, 640);
-    video.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
+    video.open(2);
+    video.set(cv::CAP_PROP_FRAME_WIDTH, 1280); //640
+    video.set(cv::CAP_PROP_FRAME_HEIGHT, 720); //480
     std::map<std::string, std::string> output;
     std::string firstLineOutput = "boneName, locationX, locationY, locationZ, rotationX, rotationY, rotationZ";
     output["-1"] = firstLineOutput;
@@ -29,33 +29,36 @@ int main()
         cv::Mat image;
         video.retrieve(image);
         std::vector<cvdetection::Marker> markers;
-        cam.getArucoMarkersPoses(0.05, image, markers, center, initialRotation);
+        cam.getArucoMarkersPoses(0.1, image, markers, center, initialRotation);
         int count = 0;
-        cvdetection::Marker *hipsMarker;
+        std::vector<cvdetection::Marker *> mappedMarkers;
         for (size_t i = 0; i < markers.size(); i++)
         {
-            if (markers[i].getId() == 0)
+            if (markers[i].getId() == 0 || markers[i].getId() == 1)
             {
                 count++;
-                hipsMarker = &(markers[i]);
-                if (!hipsMarkerfound)
+                mappedMarkers.push_back(&(markers[i]));
+                if (!hipsMarkerfound && markers[i].getId() == 0)
                 {
                     hipsMarkerfound = true;
                     center = markers[i].getLocation();
-                    //initialRotation = markers[i].getRotation();
-                    initialRotation = Eigen::Vector3d(0, M_PI, 0);
+                    initialRotation = markers[i].getRotation();
                 }
             }
         }
         if (count >= 1)
         {
-            std::string line;
-            std::string boneName = hipsMarker->getBoneName();
-            Eigen::Vector3d loc = hipsMarker->getLocation();
-            Eigen::Vector3d rot = hipsMarker->getRotation();
-            line += boneName + ", " + std::to_string(loc[0]) + ", " + std::to_string(loc[1]) + ", " + std::to_string(loc[2]);
-            line += ", " + std::to_string(rot[0]) + ", " + std::to_string(rot[1]) + ", " + std::to_string(rot[2]);
-            output["0"] = line;
+            for (size_t i = 0; i < mappedMarkers.size(); i++)
+            {
+                cvdetection::Marker *mapMarker = mappedMarkers[i];
+                std::string line;
+                std::string boneName = mapMarker->getBoneName();
+                Eigen::Vector3d loc = mapMarker->getLocation();
+                Eigen::Vector3d rot = mapMarker->getRotation();
+                line += boneName + ", " + std::to_string(loc[0]) + ", " + std::to_string(loc[1]) + ", " + std::to_string(loc[2]);
+                line += ", " + std::to_string(rot[0]) + ", " + std::to_string(rot[1]) + ", " + std::to_string(rot[2]);
+                output[std::to_string(mapMarker->getId())] = line;
+            }
             std::ofstream myfile("../../../detectedBones.csv");
             for (std::map<std::string, std::string>::iterator it = output.begin(); it != output.end(); ++it)
             {

@@ -9,7 +9,7 @@ namespace cvdetection
     enum boneMap
     {
         hips = 0,
-        forearm_L = 10
+        forearm_R = 1
     };
 
     class Marker

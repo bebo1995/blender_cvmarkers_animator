@@ -12,6 +12,9 @@ def parseCSV(csvPath):
         csv_reader = csv.reader(csv_file, delimiter=',')
         line_count = 0
         for row in csv_reader:
+            if len(row) == 0:
+                print("Empty file \n")
+                return bones                
             if line_count == 0:
                 line_count += 1
             else:
@@ -23,33 +26,33 @@ def parseCSV(csvPath):
     return bones
 
 
-def timer_call_fnc(bone):
+def timer_call_fnc(armature_bones):
     # parsing camera scene detected bones
-    bones = parseCSV(
+    detected_bones = parseCSV(
         '/home/alberto/VSCode workspace/blender_cvmarkers_animator/detectedBones.csv')
 
     # moving Blender scene bones
-    if len(bones) == 0:
+    if len(detected_bones) == 0:
         print("Empty file \n")
         return 0.01
-    bone.location[0] = -(bones[0].location[0] * 10)
-    bone.location[1] = -(bones[0].location[1] * 10)
-    bone.location[2] = -(bones[0].location[2] * 10)
-    bone.rotation_euler[0] = bones[0].rotation[2]
-    bone.rotation_euler[1] = -(bones[0].rotation[1])
-    bone.rotation_euler[2] = -(bones[0].rotation[0])
+    for detected_bone in detected_bones:
+        bone = armature_bones[detected_bone.id]
+        bone.rotation_mode = "XYZ"
+        bone.location[0] = -(detected_bone.location[0] * 10)
+        bone.location[1] = -(detected_bone.location[1] * 10)
+        bone.location[2] = -(detected_bone.location[2] * 10)
+        bone.rotation_euler[0] = detected_bone.rotation[2]
+        bone.rotation_euler[1] = detected_bone.rotation[1]
+        bone.rotation_euler[2] = -(detected_bone.rotation[0])
     return 0.01  # call every 0.01 seconds
 
 
 def main():
-    bones = parseCSV(
-        '/home/alberto/VSCode workspace/blender_cvmarkers_animator/detectedBones.csv')
     bpy.ops.object.mode_set(mode='POSE')
     armature = bpy.data.objects["metarig"]
-    bone = armature.pose.bones[bones[0].id]
-    bone.rotation_mode = "XYZ"
-    bpy.app.timers.register((functools.partial(timer_call_fnc, bone)))
-    timer_call_fnc(bone)  # make first call
+    armature_bones = armature.pose.bones
+    bpy.app.timers.register((functools.partial(timer_call_fnc, armature_bones)))
+    timer_call_fnc(armature_bones)  # make first call
 
     # unregister later:
     #bpy.app.timers .unregister( timer_call_fnc )
