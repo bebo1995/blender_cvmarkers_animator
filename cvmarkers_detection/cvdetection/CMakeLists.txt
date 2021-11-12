@@ -3,7 +3,6 @@ find_package( OpenCV REQUIRED )
 set(CAMERA_SOURCES
     src/camera.cpp
     src/marker.cpp
-    src/bone.cpp
 )
 
 add_library(cvdetection STATIC ${CAMERA_SOURCES})

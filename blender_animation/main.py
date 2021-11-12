@@ -32,12 +32,12 @@ def timer_call_fnc(bone):
     if len(bones) == 0:
         print("Empty file \n")
         return 0.01
-    bone.location[0] = bones[0].location[0]
-    bone.location[1] = bones[0].location[1]
-    bone.location[2] = bones[0].location[2]
-    bone.rotation_euler[0] = bones[0].rotation[0] / 360 * 6.28
-    bone.rotation_euler[1] = bones[0].rotation[1] / 360 * 6.28
-    bone.rotation_euler[2] = bones[0].rotation[2] / 360 * 6.28
+    bone.location[0] = -(bones[0].location[0] * 10)
+    bone.location[1] = -(bones[0].location[1] * 10)
+    bone.location[2] = -(bones[0].location[2] * 10)
+    bone.rotation_euler[0] = bones[0].rotation[2]
+    bone.rotation_euler[1] = -(bones[0].rotation[1])
+    bone.rotation_euler[2] = -(bones[0].rotation[0])
     return 0.01  # call every 0.01 seconds
 
 

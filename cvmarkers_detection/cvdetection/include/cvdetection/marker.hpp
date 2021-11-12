@@ -6,12 +6,19 @@
 
 namespace cvdetection
 {
+    enum boneMap
+    {
+        hips = 0,
+        forearm_L = 10
+    };
+
     class Marker
     {
     private:
         int id;
-        Eigen::Vector3d coordinates;
-        Eigen::Matrix3d orientation;
+        std::string boneName;
+        Eigen::Vector3d location;
+        Eigen::Vector3d rotation;
 
     public:
         /**
@@ -22,11 +29,17 @@ namespace cvdetection
         /**
          * @brief Marker instantiates a new object of the Marker class and sets its id, coordinates and rotation.
          * @param ID id of this marker.
-         * @param coordinatesVec 3D coordinates of the marker in the scene.
-         * @param orientationMat 3D rotation matrix of the marker in the scene.
+         * @param locationVec 3D coordinates of the marker in the scene.
+         * @param rotationVec 3D rotation vector (euler angles) of the marker in the scene.
          * @return instance of Marker.
          */
-        Marker(const int &ID, const Eigen::Vector3d &coordinatesVec, const Eigen::Matrix3d &orientationMat);
+        Marker(const int &ID, const Eigen::Vector3d &locationVec, const Eigen::Vector3d &rotationVec);
+
+    private:
+        /**
+         * @brief mapBone maps the Id of this marker to a Blender bone name.
+         */
+        void mapBone();
 
     public:
         /**
@@ -35,30 +48,35 @@ namespace cvdetection
          */
         void setId(const int &ID);
         /**
-         * @brief setCoordinates sets the 3D coordinates of this marker.
-         * @param coordinatesVec coordinates of the marker.
+         * @brief setLocation sets the 3D coordinates of this marker.
+         * @param locationVec coordinates of the marker.
          */
-        void setCoordinates(const Eigen::Vector3d &coordinatesVec);
+        void setLocation(const Eigen::Vector3d &locationVec);
         /**
-         * @brief setOrientation sets the 3D orientation of this marker.
-         * @param orientationVec rotation matrix of the marker.
+         * @brief setrotation sets the 3D orientation (euler angles) of this marker.
+         * @param rotationVec rotation vector of the marker.
          */
-        void setOrientation(const Eigen::Matrix3d &orientationMat);
+        void setRotation(const Eigen::Vector3d &rotationVec);
         /**
          * @brief getId returns the ID of this marker.
          * @return id of the marker.
          */
         int getId();
         /**
-         * @brief getCoordinates returns the 3D coordinates of this marker.
-         * @param coordinatesVec coordinates of the marker.
+         * @brief getLocation returns the 3D coordinates of this marker.
+         * @return coordinates of the marker.
          */
-        void getCoordinates(Eigen::Vector3d &coordinatesVec);
+        Eigen::Vector3d getLocation();
         /**
-         * @brief getOrientation returns the 3D orientation of this marker.
-         * @param orientationVec rotation matrix of the marker.
+         * @brief getRotation returns the 3D orientation (euler angles) of this marker.
+         * @return rotation vector of the marker.
          */
-        void getOrientation(Eigen::Matrix3d &orientationMat);
+        Eigen::Vector3d getRotation();
+        /**
+         * @brief getBoneName returns the name of the bone mapped to this marker.
+         * @return name of the mapped bone.
+         */
+        std::string getBoneName();
     };
 }
 

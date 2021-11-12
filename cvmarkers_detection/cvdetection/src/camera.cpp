@@ -12,6 +12,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/aruco/charuco.hpp>
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/Geometry>
 
 #include <cvdetection/camera.hpp>
 
@@ -830,7 +831,7 @@ namespace cvdetection
         return CAMERA_OK;
     }
 
-    void Camera::getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image, std::vector<Marker> &detectedMarkers, const Eigen::Vector3d &center)
+    void Camera::getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image, std::vector<Marker> &detectedMarkers, const Eigen::Vector3d &center, const Eigen::Vector3d &initialRotation)
     {
         //detecting and estimating pose of markers
         std::vector<int> markerIds;
@@ -847,13 +848,17 @@ namespace cvdetection
                 cv::aruco::drawAxis(image, camMatrix, distCoeffs, rvec[i], tvec[i], 0.1);
                 //getting 3D coordinates
                 Eigen::Vector3d coordinates(tvec[i][0], tvec[i][1], tvec[i][2]);
-                coordinates = coordinates - center;
                 //getting rotation matrix
                 cv::Mat rMat = cv::Mat::zeros(3, 3, CV_64F);
                 cv::Rodrigues(rvec[i], rMat);
                 Eigen::Map<Eigen::Matrix3d> eigenRMat(rMat.ptr<double>(), rMat.rows, rMat.cols);
+                Eigen::Vector3d eulerAngles = eigenRMat.eulerAngles(0, 1, 2);
+                Eigen::Vector3d rotVec(rvec[i][0], rvec[i][1], rvec[i][2]); //in radians
+                //centering location and rotation in initialposition
+                coordinates = coordinates - center;
+                rotVec = rotVec - initialRotation;
                 //getting Marker
-                detectedMarkers.push_back(Marker(markerIds[i], coordinates, eigenRMat));
+                detectedMarkers.push_back(Marker(markerIds[i], coordinates, rotVec));
             }
         }
     }

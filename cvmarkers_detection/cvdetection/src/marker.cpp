@@ -6,27 +6,46 @@ namespace cvdetection
     //---------- Constructors --------------------------------------------------------------->
     Marker::Marker() {}
 
-    Marker::Marker(const int &ID, const Eigen::Vector3d &coordinatesVec, const Eigen::Matrix3d &orientationMat)
+    Marker::Marker(const int &ID, const Eigen::Vector3d &coordinatesVec, const Eigen::Vector3d &orientationMat)
     {
         this->id = ID;
-        this->coordinates = coordinatesVec;
-        this->orientation = orientationMat;
+        this->location = coordinatesVec;
+        this->rotation = orientationMat;
+        this->mapBone();
+    }
+
+    //---------- Private methods --------------------------------------------------------------->
+    void Marker::mapBone()
+    {
+        switch (this->id)
+        {
+        case boneMap::hips:
+            this->boneName = "hips";
+            break;
+        case boneMap::forearm_L:
+            this->boneName = "forearm_L";
+            break;
+        default:
+            this->boneName = "";
+            break;
+        }
     }
 
     //---------- Public methods --------------------------------------------------------------->
     void Marker::setId(const int &ID)
     {
         this->id = ID;
+        this->mapBone();
     }
 
-    void Marker::setCoordinates(const Eigen::Vector3d &coordinatesVec)
+    void Marker::setLocation(const Eigen::Vector3d &locationVec)
     {
-        this->coordinates = coordinatesVec;
+        this->location = locationVec;
     }
 
-    void Marker::setOrientation(const Eigen::Matrix3d &orientationMat)
+    void Marker::setRotation(const Eigen::Vector3d &rotationVec)
     {
-        this->orientation = orientationMat;
+        this->rotation = rotationVec;
     }
 
     int Marker::getId()
@@ -34,13 +53,18 @@ namespace cvdetection
         return this->id;
     }
 
-    void Marker::getCoordinates(Eigen::Vector3d &coordinatesVec)
+    Eigen::Vector3d Marker::getLocation()
     {
-        coordinatesVec = this->coordinates;
+        return this->location;
     }
 
-    void Marker::getOrientation(Eigen::Matrix3d &orientationMat)
+    Eigen::Vector3d Marker::getRotation()
     {
-        orientationMat = this->orientation;
+        return this->rotation;
+    }
+
+    std::string Marker::getBoneName()
+    {
+        return this->boneName;
     }
 }

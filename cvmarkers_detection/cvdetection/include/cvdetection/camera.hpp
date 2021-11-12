@@ -53,9 +53,11 @@ namespace cvdetection
          * @param image to be analyzed.
          * @param detectedMarkers vector containing all Aruco markers detected in the image.
          * @param center 3D coordinates of the center of the scene (default = 0,0,0).
+         * @param initialRotation 3D euler angles of the initial rotation of the scene (default = 0,0,0).
          */
         void getArucoMarkersPoses(const float &markerSide, cv::InputOutputArray &image,
-                                  std::vector<Marker> &detectedMarkers, const Eigen::Vector3d &center = Eigen::Vector3d(0, 0, 0));
+                                  std::vector<Marker> &detectedMarkers, const Eigen::Vector3d &center = Eigen::Vector3d(0, 0, 0),
+                                  const Eigen::Vector3d &initialRotation = Eigen::Vector3d(0, 0, 0));
 
     public:
         /**

@@ -1,6 +1,5 @@
-set(MY_EXECUTABLE_SOURCES
-    main.cpp
-)
-add_executable(my_executable ${MY_EXECUTABLE_SOURCES})
+add_executable(main main.cpp)
+target_link_libraries(main PRIVATE cvdetection)
 
-target_link_libraries(my_executable PRIVATE cvdetection)
+#add_executable(printmarker printmarker.cpp)
+#target_link_libraries(printmarker PRIVATE cvdetection)
